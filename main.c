@@ -5,12 +5,40 @@
 
 //user and admins
 
-void userLogin();
+void userLogin(struct voterStruct *voter);
 void staffLogin(int useCase, char usernameFile[50], char passwordFile[50], FILE *username, FILE *password);
 
-void loggedInVoter();
-void loggedInAdmin();
-void loggedInOfficer();
+void loggedInVoter(char username[], struct voterStruct *voter);
+void loggedInAdmin(char username[]);
+void loggedInOfficer(char username[]);
+
+struct voterStruct {
+    char username[20];
+    char password[16];
+    char fName[20];
+    char lName[20];
+    char address[30];
+    char phoneNum[10];
+    bool voted;
+    bool valid;
+};
+
+struct staffStruct {
+    char username[20];
+    char password[16];
+    char fName[20];
+    char lName[20];
+    char address[30];
+    char phoneNum[10];
+};
+
+struct canStruct {
+    char fName[20];
+    char lName[20];
+    char address[30];
+    char phoneNum[10];
+    int votes;
+};
 
 #define FILENAME_SIZE 1024
 #define MAX_LINE 2048
@@ -27,12 +55,10 @@ FILE *passwordData_Admin;
 FILE *usernameData_Officer;
 FILE *passwordData_Officer;
 
-
-
 int main() {
     int useCase;
 
-    //Voter
+    //Voter File for username and password
     usernameData_Voter = fopen("usernameVoter_column.txt", "w");
     fprintf(usernameData_Voter, "JohnUser\n");
     fclose(usernameData_Voter);
@@ -41,14 +67,34 @@ int main() {
     fprintf(passwordData_Voter, "Passw0rd\n");
     fclose(passwordData_Voter);
 
+    //Voter struct
+    struct voterStruct voterAccount;
+    voterAccount.voted = false;
+    voterAccount.valid = false;
+    strcpy(voterAccount.username, "JohnUser");
+    strcpy(voterAccount.password, "Passw0rd");
+    strcpy(voterAccount.fName, "John");
+    strcpy(voterAccount.lName, "User");
+    strcpy(voterAccount.address, "123 Fake Street");
+    strcpy(voterAccount.phoneNum, "1845");
+
     //Admin
     usernameData_Admin = fopen("usernameAdmin_column.txt", "w");
     fprintf(usernameData_Admin, "JohnAdmin\n");
     fclose(usernameData_Admin);
 
     passwordData_Admin = fopen("passwordAdmin_column.txt", "w");
-    fprintf(passwordData_Admin, "Passw0rd\n");
+    fprintf(passwordData_Admin, "P@ssw0rd\n");
     fclose(passwordData_Admin);
+
+    //Admin struct
+    struct staffStruct adminAccount;
+    strcpy(voterAccount.username, "JohnAdmin");
+    strcpy(voterAccount.password, "P@ssw0rd");
+    strcpy(voterAccount.fName, "John");
+    strcpy(voterAccount.lName, "Admin");
+    strcpy(voterAccount.address, "650 Fake Street");
+    strcpy(voterAccount.phoneNum, "1765");
 
     //Polling Officer
     usernameData_Officer = fopen("usernameOfficer_column.txt", "w");
@@ -56,8 +102,40 @@ int main() {
     fclose(usernameData_Officer);
 
     passwordData_Officer = fopen("passwordOfficer_column.txt", "w");
-    fprintf(passwordData_Officer, "Passw0rd\n");
+    fprintf(passwordData_Officer, "secret\n");
     fclose(passwordData_Officer);
+
+    //Officer struct
+    struct staffStruct officerAccount;
+    strcpy(voterAccount.username, "JohnOff");
+    strcpy(voterAccount.password, "secret");
+    strcpy(voterAccount.fName, "John");
+    strcpy(voterAccount.lName, "Officer");
+    strcpy(voterAccount.address, "101 Fake Street");
+    strcpy(voterAccount.phoneNum, "1234");
+
+    //Candidate struct
+    struct canStruct candidate1;
+    struct canStruct candidate2;
+    struct canStruct candidate3;
+
+    strcpy(candidate1.fName, "Can");
+    strcpy(candidate1.lName, "One");
+    strcpy(candidate1.address, "1 Fake Street");
+    strcpy(candidate1.phoneNum, "9082");
+    candidate1.votes = 5;
+
+    strcpy(candidate2.fName, "Can");
+    strcpy(candidate2.lName, "Two");
+    strcpy(candidate2.address, "2 Fake Street");
+    strcpy(candidate2.phoneNum, "0032");
+    candidate2.votes = 25;
+
+    strcpy(candidate3.fName, "Can");
+    strcpy(candidate3.lName, "Three");
+    strcpy(candidate3.address, "3 Fake Street");
+    strcpy(candidate3.phoneNum, "8034");
+    candidate3.votes = 12;
 
     bool run = true;
 
@@ -79,7 +157,7 @@ int main() {
             switch (useCase) {
                 case 1:
                     //User
-                    userLogin();
+                    userLogin(&voterAccount);
                     break;
                 case 2:
                     //Admin
@@ -105,7 +183,7 @@ int main() {
     return 0;
 }
 
-void userLogin() {
+void userLogin(struct voterStruct *voter) {
     int logReg;
 
     printf("Key: Login = 1 | Register = 2\n");
@@ -134,7 +212,6 @@ void userLogin() {
                     printf("Not found!\n");
                     keep_reading = false;
                 } else if(strcmp(buffer, username) == 0){
-                    printf("Correct username!\n");
                     readLine++;
                     passwordData_Voter = fopen("password_column.txt", "r");
                     do {
@@ -144,8 +221,7 @@ void userLogin() {
                             keep_reading = false;
                         } else if(current_line == readLine){
                             if(strcmp(buffer, password) == 0){
-                                printf("Password Matches login name, you are now logged in\n");
-                                loggedInVoter();
+                                loggedInVoter(username, voter);
                                 keep_reading = false;
                             } else {
                                 printf("Username/Password Combo incorrect");
@@ -187,7 +263,6 @@ void staffLogin(int useCase, char usernameFile[50], char passwordFile[50], FILE 
             printf("Not found!\n");
             keep_reading = false;
         } else if(strcmp(buffer, username) == 0){
-            printf("Correct username!\n");
             readLine++;
             passwordVar = fopen((const char *) passwordFile, "r");
             do {
@@ -197,11 +272,10 @@ void staffLogin(int useCase, char usernameFile[50], char passwordFile[50], FILE 
                     keep_reading = false;
                 } else if(current_line == readLine){
                     if(strcmp(buffer, password) == 0){
-                        printf("Password Matches login name, you are now logged in\n");
                         if(useCase == 2){
-                            loggedInAdmin();
+                            loggedInAdmin(username);
                         } else if (useCase == 3){
-                            loggedInOfficer();
+                            loggedInOfficer(username);
                         } else {
                             printf("Please report this error to the person responsible for this software."
                                    " Code:197");
@@ -222,14 +296,155 @@ void staffLogin(int useCase, char usernameFile[50], char passwordFile[50], FILE 
     fclose(usernameVar);
 };
 
-void loggedInVoter(){
-    printf("You are now logged in as user\n");
+void loggedInVoter(char username[], struct voterStruct *voter){
+    bool run = true;
+    printf("Hello: %s\n", username);
+    printf("What would you like to do today?\n");
+    do {
+        printf("Key: Edit Account Details = 1 | Vote = 2 | Contact Support = 3 | Exit = 0\n");
+        int response;
+        scanf("%i", &response);
+
+        switch (response) {
+            case 1:
+                bool run = true;
+                printf("Editing account\n");
+                do {
+                    printf("What would you like to change?");
+                    printf("Key: username = 1 | password = 2 | first name = 3 | last name = 4 | address = 5 |"
+                           " phone number = 6 | Exit = 0\n");
+                    scanf("%i", &response);
+
+                    switch (response) {
+                        case 1:
+                            printf("Username is: %s\n", voter->username);
+                            printf("Type in what you would like to change it to: \n");
+                            char usernameChng[50];
+                            fgets(usernameChng, 50, stdin);
+                            strcpy(voter->username, usernameChng);
+                            break;
+
+                        case 2:
+                            printf("Please type in your old password: \n");
+                            char oldPass[16];
+                            fgets(oldPass, 16, stdin);
+                            if(oldPass == voter->password) {
+                                printf("Type in what you would like to change it to: \n");
+                                char passwordChng[50];
+                                fgets(passwordChng, 50, stdin);
+                                strcpy(voter->password, passwordChng);
+                            } else {
+                                printf("You have entered an incorrect password, please try again.");
+                            }
+                            break;
+                        case 3:
+                            printf("First Name: %s", voter->fName);
+                            printf("Type in what you would like to change it to: \n");
+                            char fNameChng[50];
+                            fgets(fNameChng, 50, stdin);
+                            strcpy(voter->fName, fNameChng);
+                            break;
+                        case 4:
+                            printf("Last Name: %s", voter->lName);
+                            printf("Type in what you would like to change it to: \n");
+                            char lNameChng[50];
+                            fgets(lNameChng, 50, stdin);
+                            strcpy(voter->lName, lNameChng);
+                            break;
+                        case 5:
+                            printf("Address on file: %s", voter->address);
+                            printf("Type in what you would like to change it to: \n");
+                            char addressChng[50];
+                            fgets(addressChng, 50, stdin);
+                            strcpy(voter->address, addressChng);
+                            break;
+                        case 6:
+                            printf("Phone Number: %s", voter->phoneNum);
+                            printf("Type in what you would like to change it to: \n");
+                            char phoneNumChng[4];
+                            fgets(phoneNumChng, 4, stdin);
+                            strcpy(voter->phoneNum, phoneNumChng);
+                            break;
+                        case 0:
+                            printf("Exiting\n");
+                            run = false;
+                            break;
+                        default:
+                            printf("ERROR");
+                    }
+                } while (run);
+                break;
+            case 2:
+                printf("Voting\n");
+                break;
+            case 3:
+                printf("Contacting Support\n");
+                break;
+            case 0:
+                printf("Thank you for using online polling.\nHave a great day!\n");
+                run = false;
+                break;
+            default:
+                printf("Please enter a valid response\n");
+        }
+    } while (run);
 };
 
-void loggedInAdmin(){
-    printf("You are now logged in as admin\n");
+void loggedInAdmin(char username[]){
+    bool run = true;
+    printf("Hello: %s\n", username);
+    printf("What would you like to do today?\n");
+    do {
+        printf("Key: Edit Account Details = 1 | Vote = 2 | Contact Support = 3 | Exit = 0\n");
+        int response;
+        scanf("%i", &response);
+
+        switch (response) {
+            case 1:
+                printf("Editing account\n");
+                break;
+            case 2:
+                printf("Fixing account issues\n");
+                break;
+            case 3:
+                printf("Contacting Polling Officer\n");
+                break;
+            case 0:
+                printf("Remember to fully close out your session and to punch out.\nHave a great day!");
+                run = false;
+                break;
+            default:
+                printf("Please enter a valid response\n");
+        }
+    } while (run);
 };
 
-void loggedInOfficer(){
-    printf("You are now logged in as polling officer\n");
+void loggedInOfficer(char username[]){
+    bool run = true;
+    printf("Hello: %s\n", username);
+    printf("What would you like to do today?\n");
+    do {
+        printf("Key: Edit Account Details = 1 | Vote = 2 | Contact Support = 3 | Exit = 0\n");
+        int response;
+        scanf("%i", &response);
+
+        switch (response) {
+            case 1:
+                printf("Editing account\n");
+                break;
+            case 2:
+                printf("Fixing issues related to polling\n");
+                break;
+            case 3:
+                printf("Counting votes\n");
+                break;
+            case 0:
+                printf("Thank you for using online polling.\nHave a great day!\n");
+                run = false;
+                break;
+            default:
+                printf("Please enter a valid response\n");
+        }
+    } while (run);
 };
+
