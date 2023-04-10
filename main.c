@@ -33,9 +33,9 @@ struct Candidate {
 };
 //endregion
 
-void accountSettingsVoter(struct Voter voter);
-void accountSettingsAdmin(struct Staff admin);
-void accountSettingsOffic(struct Staff officer);
+struct Voter accountSettingsVoter(struct Voter voter);
+struct Staff accountSettingsAdmin(struct Staff admin);
+struct Staff accountSettingsOffic(struct Staff officer);
 
 
 void userLogin(struct Voter, struct Candidate, struct Candidate, struct Candidate);
@@ -268,7 +268,7 @@ void userLogin(struct Voter voter, struct Candidate candidate1, struct Candidate
                                 loggedInVoter(username, voter, candidate1, candidate2, candidate3);
                                 keep_reading = false;
                             } else {
-                                printf("Username/Password Combo incorrect");
+                                printf("Username/Password Combo incorrect\n");
                             }
                         }
                         current_line++;
@@ -282,10 +282,10 @@ void userLogin(struct Voter voter, struct Candidate candidate1, struct Candidate
             fclose(usernameData_Voter);
             break;
         case 2:
-            printf("Please register!");
+            printf("Please register!\n");
             break;
         default:
-            printf("Invalid response, please try again.");
+            printf("Invalid response, please try again.\n");
     }
 };
 //endregion
@@ -346,7 +346,7 @@ void staffLogin(int useCase, char usernameFile[50], char passwordFile[50], FILE 
 //endregion
 
 //region Account details Voter
-void accountSettingsVoter(struct Voter voter){
+struct Voter accountSettingsVoter(struct Voter voter){
     bool edit = true;
     printf("Editing account\n");
     int response;
@@ -418,6 +418,7 @@ void accountSettingsVoter(struct Voter voter){
                 printf("ERROR");
         }
     } while (edit);
+    return voter;
 };
 //endregion
 
@@ -435,7 +436,7 @@ void loggedInVoter(char username[], struct Voter voter, struct Candidate candida
 
         switch (response) {
             case 1:
-                accountSettingsVoter(voter);
+                voter = accountSettingsVoter(voter);
                 break;
             case 2:
                 printf("Voting\n");
@@ -494,7 +495,7 @@ void loggedInVoter(char username[], struct Voter voter, struct Candidate candida
 //endregion
 
 //region Account details admin
-void accountSettingsAdmin(struct Staff admin){
+struct Staff accountSettingsAdmin(struct Staff admin){
     bool edit = true;
     int response;
     printf("Editing account\n");
@@ -568,6 +569,7 @@ void accountSettingsAdmin(struct Staff admin){
                 printf("ERROR");
         }
     } while (edit);
+    return admin;
 };
 //endregion
 
@@ -581,15 +583,45 @@ void loggedInAdmin(char username[], struct Staff staff, struct Voter voter){
         printf("Key: Edit Account Details = 1 | Check for Issues = 2 | Contact Polling Officer = 3 | Exit = 0\n");
         int response;
         scanf("%i", &response);
+        char blank[10];
 
         switch (response) {
             case 1:
-                accountSettingsAdmin(staff);
+                staff = accountSettingsAdmin(staff);
                 break;
             case 2:
                 printf("Fixing account issues\n");
-                printf("");
-                break;
+                fgets(blank, 10, stdin);
+                char text[100];
+                printf("What would you like to do?\n");
+                printf("Old = 1 | New = 2 | Work on Issues = 3 | Exit = 0\n");
+                scanf("%d", &response);
+                switch (response) {
+                    case 1:
+                        printf("Old messages\n");
+                        issues_Admin = fopen("issues_admin.txt", "r");
+                        while (fgets(text, 100, issues_Admin)) {
+                            printf("%s", text);
+                        };
+                        fclose(issues_Admin);
+                        break;
+                    case 2:
+                        printf("New Messages\n");
+                        officerToAdmin = fopen("offToAdmin.txt", "r");
+                        while (fgets(text, 100, officerToAdmin)) {
+                            printf("%s", text);
+                        };
+                        fclose(officerToAdmin);
+                        break;
+                    case 3:
+                        fgets(blank, 10, stdin);
+                        printf("Editing Voter account\n");
+                        accountSettingsVoter(voter);
+                        break;
+                    default:
+                        scanf("ERROR");
+                        break;
+                }
             case 3:
                 printf("Contacting Polling Officer\n");
                 break;
@@ -605,7 +637,7 @@ void loggedInAdmin(char username[], struct Staff staff, struct Voter voter){
 //endregion
 
 //region Account details officer
-void accountSettingsOffic(struct Staff officer){
+struct Staff accountSettingsOffic(struct Staff officer){
     bool edit = true;
     int response;
     char blank[10];
@@ -677,12 +709,13 @@ void accountSettingsOffic(struct Staff officer){
                 printf("ERROR");
         }
     } while (edit);
+    return officer;
 }
 //endregion
 
 //region loggedInOfficer
-void loggedInOfficer(char username[], struct Staff admin, struct Staff officer, struct Voter voter, struct Candidate candidate1,
-                     struct Candidate candidate2, struct Candidate candidate3){
+void loggedInOfficer(char username[], struct Staff admin, struct Staff officer, struct Voter voter,
+        struct Candidate candidate1, struct Candidate candidate2, struct Candidate candidate3){
     bool run = true;
     printf("Hello: %s\n", username);
     printf("What would you like to do today?\n");
@@ -696,7 +729,7 @@ void loggedInOfficer(char username[], struct Staff admin, struct Staff officer, 
 
         switch (response) {
             case 1:
-                accountSettingsOffic(officer);
+                officer = accountSettingsOffic(officer);
                 break;
             case 2:
                 fgets(blank, 10, stdin);
@@ -781,7 +814,7 @@ void loggedInOfficer(char username[], struct Staff admin, struct Staff officer, 
                 printf("%s %s has: %d votes.\n", candidate3.fName, candidate3.lName, candidate3.votes);
                 break;
             case 0:
-                printf("Remember to fully close out your session and to punch out.\nHave a great day!");
+                printf("Remember to fully close out your session and to punch out.\nHave a great day!\n");
                 run = false;
                 break;
             default:
