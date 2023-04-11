@@ -580,7 +580,7 @@ void loggedInAdmin(char username[], struct Staff staff, struct Voter voter){
     printf("What would you like to do today?\n");
     bool edit;
     do {
-        printf("Key: Edit Account Details = 1 | Check for Issues = 2 | Contact Polling Officer = 3 | Exit = 0\n");
+        printf("Key: Edit Account Details = 1 | Accept Work = 2 | Contact Polling Officer = 3 | Exit = 0\n");
         int response;
         scanf("%i", &response);
         char blank[10];
@@ -723,7 +723,7 @@ void loggedInOfficer(char username[], struct Staff admin, struct Staff officer, 
     char blank[10];
 
     do {
-        printf("Key: Edit Account Details = 1 | Fix Polls = 2 | Count Votes = 3 | Exit = 0\n");
+        printf("Key: Edit Account Details = 1 | Accept Work = 2 | Count Votes = 3 | Exit = 0\n");
         int response;
         scanf("%i", &response);
 
