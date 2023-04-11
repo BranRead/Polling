@@ -1,1 +1,1 @@
-I found a bug with your program!
+Hello, my votes won't go through.

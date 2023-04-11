@@ -182,7 +182,7 @@ int main() {
     void polExp();
 
     do{
-        printf("Key: User = 1 | Staff = 2 | Polling Officer = 3 | Exit = 0\n");
+        printf("Key: User = 1 | Admin = 2 | Polling Officer = 3 | Exit = 0\n");
         printf("What type of user are you?\n");
 
 
@@ -199,7 +199,7 @@ int main() {
                     userLogin(voterAccount, candidate1, candidate2, candidate3);
                     break;
                 case 2:
-                    //Staff
+                    //Admin
                     staffLogin(useCase, "usernameAdmin_column.txt", "passwordAdmin_column.txt",
                                usernameData_Admin, passwordData_Admin, adminAccount,
                                officerAccount, voterAccount, candidate1, candidate2, candidate3);
@@ -326,11 +326,11 @@ void staffLogin(int useCase, char usernameFile[50], char passwordFile[50], FILE 
                             loggedInOfficer(username, admin, officer, voter, candidate1, candidate2, candidate3);
                         } else {
                             printf("Please report this error to the person responsible for this software."
-                                   " Code:197");
+                                   " Code:197\n");
                         }
                         keep_reading = false;
                     } else {
-                        printf("Username/Password Combo incorrect");
+                        printf("Username/Password Combo incorrect\n");
                     }
                 }
                 current_line++;
@@ -352,8 +352,8 @@ struct Voter accountSettingsVoter(struct Voter voter){
     int response;
     do {
         printf("What would you like to change?\n");
-        printf("Key: username = 1 | password = 2 | first name = 3 | last name = 4 | address = 5 |"
-               " phone number = 6 | Exit = 0\n");
+        printf("Key: Username = 1 | Password = 2 | First Name = 3 | Last Name = 4 | Address = 5 |"
+               " Phone Number = 6 | Exit = 0\n");
 
         char blank[10];
         scanf("%i", &response);
@@ -379,7 +379,7 @@ struct Voter accountSettingsVoter(struct Voter voter){
                     fgets(passwordChng, 50, stdin);
                     strcpy(voter.password, passwordChng);
                 } else {
-                    printf("You have entered an incorrect password, please try again.");
+                    printf("You have entered an incorrect password, please try again.\n");
                 }
                 break;
             case 3:
@@ -415,7 +415,7 @@ struct Voter accountSettingsVoter(struct Voter voter){
                 edit = false;
                 break;
             default:
-                printf("ERROR");
+                printf("ERROR\n");
         }
     } while (edit);
     return voter;
@@ -455,26 +455,29 @@ void loggedInVoter(char username[], struct Voter voter, struct Candidate candida
                         case 1:
                             printf("You have voted for: %s %s\n", candidate1.fName, candidate1.lName);
                             candidate1.votes++;
+                            voter.voted = true;
                             break;
                         case 2:
                             printf("You have voted for: %s %s\n", candidate2.fName, candidate2.lName);
                             candidate2.votes++;
+                            voter.voted = true;
                             break;
                         case 3:
                             printf("You have voted for: %s %s\n", candidate3.fName, candidate3.lName);
                             candidate3.votes++;
+                            voter.voted = true;
                             break;
                         default:
                             printf("There was an issue casting your vote, please try again later.\n");
                     }
                 } else if (voter.voted){
-                    printf("You have already voted, you are unable to vote twice during this election period.");
+                    printf("You have already voted, you are unable to vote twice during this election period.\n");
                 } else {
-                    printf("Please contact the administrator to approve your account");
+                    printf("Please contact the administrator to approve your account\n");
                 }
                 break;
             case 3:
-                printf("Contacting Support\n");
+                printf("Contacting Polling Officer\n");
                 voterToOfficer = fopen("voter_queries.txt", "w");
                 fgets(blank, 10, stdin);
                 char text[100];
@@ -482,6 +485,7 @@ void loggedInVoter(char username[], struct Voter voter, struct Candidate candida
                 fgets(text, 100, stdin);
                 fprintf(voterToOfficer, "%s", text);
                 fclose(voterToOfficer);
+                printf("Message sent to Polling Officer\n");
                 break;
             case 0:
                 printf("Thank you for using online polling.\nHave a great day!\n");
@@ -501,8 +505,8 @@ struct Staff accountSettingsAdmin(struct Staff admin){
     printf("Editing account\n");
     do {
         printf("What would you like to change?\n");
-        printf("Key: username = 1 | password = 2 | first name = 3 | last name = 4 | address = 5 |"
-               " phone number = 6 | Exit = 0\n");
+        printf("Key: Username = 1 | Password = 2 | First Name = 3 | Last Name = 4 | Address = 5 |"
+               " Phone Number = 6 | Exit = 0\n");
         char blank[10];
         scanf("%i", &response);
         fgets(blank, 10, stdin);
@@ -624,9 +628,16 @@ void loggedInAdmin(char username[], struct Staff staff, struct Voter voter){
                 }
             case 3:
                 printf("Contacting Polling Officer\n");
+                adminToOfficer = fopen("admin_queries.txt", "w");
+                fgets(blank, 10, stdin);
+                printf("Please type out your message here: \n");
+                fgets(text, 100, stdin);
+                fprintf(adminToOfficer, "%s", text);
+                fclose(adminToOfficer);
+                printf("Message sent to Polling Officer\n");
                 break;
             case 0:
-                printf("Remember to fully close out your session and to punch out.\nHave a great day!");
+                printf("Remember to fully close out your session and to punch out.\nHave a great day!\n");
                 run = false;
                 break;
             default:
@@ -644,8 +655,8 @@ struct Staff accountSettingsOffic(struct Staff officer){
     printf("Editing account\n");
     do {
         printf("What would you like to change?\n");
-        printf("Key: username = 1 | password = 2 | first name = 3 | last name = 4 | address = 5 |"
-               " phone number = 6 | Exit = 0\n");
+        printf("Key: Username = 1 | Password = 2 | First Name = 3 | Last Name = 4 | Address = 5 |"
+               " Phone Number = 6 | Exit = 0\n");
 
 
         scanf("%i", &response);
@@ -670,25 +681,25 @@ struct Staff accountSettingsOffic(struct Staff officer){
                     fgets(passwordChng, 50, stdin);
                     strcpy(officer.password, passwordChng);
                 } else {
-                    printf("You have entered an incorrect password, please try again.");
+                    printf("You have entered an incorrect password, please try again.\n");
                 }
                 break;
             case 3:
-                printf("First Name: %s", officer.fName);
+                printf("First Name: %s\n", officer.fName);
                 printf("Type in what you would like to change it to: \n");
                 char fNameChng[50];
                 fgets(fNameChng, 50, stdin);
                 strcpy(officer.fName, fNameChng);
                 break;
             case 4:
-                printf("Last Name: %s", officer.lName);
+                printf("Last Name: %s\n", officer.lName);
                 printf("Type in what you would like to change it to: \n");
                 char lNameChng[50];
                 fgets(lNameChng, 50, stdin);
                 strcpy(officer.lName, lNameChng);
                 break;
             case 5:
-                printf("Address on file: %s", officer.address);
+                printf("Address on file: %s\n", officer.address);
                 printf("Type in what you would like to change it to: \n");
                 char addressChng[50];
                 fgets(addressChng, 50, stdin);
@@ -706,7 +717,7 @@ struct Staff accountSettingsOffic(struct Staff officer){
                 edit = false;
                 break;
             default:
-                printf("ERROR");
+                printf("ERROR\n");
         }
     } while (edit);
     return officer;
@@ -790,10 +801,10 @@ void loggedInOfficer(char username[], struct Staff admin, struct Staff officer, 
                                         fclose(officerToAdmin);
                                         break;
                                     case 0:
-                                        printf("Exiting outgoing messages.");
+                                        printf("Exiting outgoing messages.\n");
                                         break;
                                     default:
-                                        printf("ERROR");
+                                        printf("ERROR\n");
                                 }
                                 break;
                             case 2:
@@ -803,7 +814,7 @@ void loggedInOfficer(char username[], struct Staff admin, struct Staff officer, 
                                 accountSettingsVoter(voter);
                                 break;
                             default:
-                                printf("ERROR");
+                                printf("ERROR\n");
                         }
                 }
                 break;
